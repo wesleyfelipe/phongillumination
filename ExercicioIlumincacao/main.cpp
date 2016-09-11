@@ -91,29 +91,22 @@ void calcColor(GLfloat *vetn, GLfloat x, GLfloat y, GLfloat z) {
 	//5) criar variáveis novas para normalizar (normalize): VL, view_pos e VN
 	GLfloat vetlN[] = {vetl[0], vetl[1], vetl[2]};
 	normalize(vetlN);
-
 	GLfloat vetPosN[] = {view_pos[0], view_pos[1], view_pos[2]};
 	normalize(vetPosN);
-
 	GLfloat vetnN[] = {vetn[0], vetn[1], vetn[2]};
 	normalize(vetnN);
 	//6) calcular VR conforme fórmula do slide da especular com normal, Ad e vligth
 	GLfloat vr[] = { vetnN[0] * (1 - angulo_difusa) - vetlN[0], vetnN[1] * (1 - angulo_difusa) - vetlN[1], vetnN[2] * (1 - angulo_difusa) - vetlN[2] };
-
 	//7) calcular angulo da especular, dotProduct entre VR e view
 	GLfloat angulo_especular = dotProduct(vr, vetPosN);
-
 	//8) calcular As com shiness (nShiny)
+	GLfloat rgb[3];
+	for (int i = 0; i < 3; i++) {
+		GLfloat result = Ia * Ka * obj_color[i] + fatt * Ip * (Kd * dif_color[i] * angulo_difusa + Ks * spec_color[i] * pow(angulo_especular, nShiny));
+		rgb[i] = max(0, min(1, result));
+	}
 
-	GLfloat r = Ia * Ka * obj_color[0] + fatt * Ip * (Kd * dif_color[0] * angulo_difusa + Ks * spec_color[0] * pow(angulo_especular, nShiny));
-	GLfloat g = Ia * Ka * obj_color[1] + fatt * Ip * (Kd * dif_color[1] * angulo_difusa + Ks * spec_color[1] * pow(angulo_especular, nShiny));
-	GLfloat b = Ia * Ka * obj_color[2] + fatt * Ip * (Kd * dif_color[2] * angulo_difusa + Ks * spec_color[2] * pow(angulo_especular, nShiny));
-
-	r = max(0, min(1, r));
-	g = max(0, min(1, g));
-	b = max(0, min(1, b));
-
-	glColor3f(r, g, b);
+	glColor3fv(rgb);
 }
 
 void drawtri(GLfloat *a, GLfloat *b, GLfloat *c, int div, float r, GLfloat *trans_vet) {
